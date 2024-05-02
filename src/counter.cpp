@@ -380,7 +380,7 @@ void Counter::set_up_probs_threshold_measurements(
       for (int i = 0; i <= t; i++)
         n_error_prob += factorial(measurements)/(factorial(i)*factorial(measurements-i)) *
           pow(1.0 - error_prob,i) * pow(error_prob, measurements - i);
-      if (n_error_prob < conf.delta) break;
+      if (n_error_prob <= conf.delta) break;
 
     }
 
