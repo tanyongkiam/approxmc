@@ -132,6 +132,11 @@ DLL_PUBLIC void AppMC::set_delta(double delta)
     data->conf.delta = delta;
 }
 
+DLL_PUBLIC void AppMC::set_g(double g)
+{
+    data->conf.g = g;
+}
+
 DLL_PUBLIC void AppMC::set_debug(int debug) { data->conf.debug = debug; }
 DLL_PUBLIC void AppMC::set_force_sol_extension(int val) {
     data->conf.force_sol_extension = val;
@@ -181,6 +186,11 @@ DLL_PUBLIC double AppMC::get_epsilon()
 DLL_PUBLIC double AppMC::get_delta()
 {
     return data->conf.delta;
+}
+
+DLL_PUBLIC double AppMC::get_g()
+{
+    return data->conf.g;
 }
 
 DLL_PUBLIC uint32_t AppMC::get_simplify()

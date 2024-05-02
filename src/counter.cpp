@@ -333,6 +333,13 @@ void Counter::simplify()
     solver->set_full_bve(0);
 }
 
+double factorial(const int n)
+{
+    double f = 1.0;
+    for (int i=1; i<=n; i++) f *= (double) i;
+    return f;
+}
+
 //Set up probabilities, threshold and measurements
 void Counter::set_up_probs_threshold_measurements(
     uint32_t& measurements, SparseData& sparse_data)
@@ -340,6 +347,8 @@ void Counter::set_up_probs_threshold_measurements(
     int best_match = -1;
     bool using_sparse = false;
     double thresh_factor;
+    double error_prob;
+    double n_error_prob;
 
     if (conf.sparse) {
         best_match = find_best_sparse_match();
@@ -354,22 +363,30 @@ void Counter::set_up_probs_threshold_measurements(
     }
 
     threshold = int(
-        1 +
         thresh_factor*
-        9.84*
+        conf.g*
         (1.0+(1.0/conf.epsilon))*
         (1.0+(1.0/conf.epsilon))*
         (1.0+(conf.epsilon/(1.0+conf.epsilon)))
     );
 
-    verb_print(1, "[appmc] threshold set to " << threshold << " sparse: " << (int)using_sparse);
-    measurements = (int)std::ceil(std::log2(3.0/conf.delta)*17);
-    for (int count = 0; count < 256; count++) {
-        if (constants.iterationConfidences[count] >= 1 - conf.delta) {
-            measurements = count*2+1;
-            break;
-        }
+    error_prob = 1.0 / (1.0 + 6.25 * conf.g) + 1.0 / (1.0 + 2.0 * conf.g) + 1.0 / (1.0 + conf.g) + 2.0 / conf.g;
+
+    assert(error_prob < 0.5);
+
+    for (int t= 0; ; t++) {
+      n_error_prob = 0;
+      measurements = 2 * t + 1;
+      for (int i = 0; i <= t; i++)
+        n_error_prob += factorial(measurements)/(factorial(i)*factorial(measurements-i)) *
+          pow(1.0 - error_prob,i) * pow(error_prob, measurements - i);
+      if (n_error_prob < conf.delta) break;
+
     }
+
+    verb_print(1, "[appmc] single round error probability: " << error_prob);
+    verb_print(1, "[appmc] multi round error probability: " << n_error_prob<< " rounds: "<< measurements);
+    verb_print(1, "[appmc] threshold set to " << threshold << " sparse: " << (int)using_sparse);
 }
 
 bool Counter::find_one_solution()

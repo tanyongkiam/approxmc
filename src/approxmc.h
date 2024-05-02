@@ -99,6 +99,7 @@ public:
     void set_seed(uint32_t seed);
     void set_epsilon(double epsilon);
     void set_delta(double delta);
+    void set_g(double g);
     CMSat::SATSolver* get_solver();
 
     //Misc options -- do NOT to change unless you know what you are doing!
@@ -118,6 +119,7 @@ public:
     double get_epsilon();
     uint32_t get_seed();
     double get_delta();
+    double get_g();
     uint32_t get_simplify();
     double get_var_elim_ratio();
     uint32_t get_sparse();

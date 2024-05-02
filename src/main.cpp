@@ -57,6 +57,7 @@ argparse::ArgumentParser program = argparse::ArgumentParser("approxmc");
 uint32_t verb = 1;
 uint32_t seed;
 double epsilon;
+double g;
 double delta;
 string logfilename;
 uint32_t start_iter = 0;
@@ -96,6 +97,7 @@ void add_appmc_options()
     ApproxMC::AppMC tmp;
     epsilon = tmp.get_epsilon();
     delta = tmp.get_delta();
+    g = tmp.get_g();
     simplify = tmp.get_simplify();
     var_elim_ratio = tmp.get_var_elim_ratio();
     sparse = tmp.get_sparse();
@@ -104,6 +106,9 @@ void add_appmc_options()
 
     myopt2("-v", "--verb", verb, atoi, "Verbosity");
     myopt2("-s", "--seed", seed, atoi, "Seed");
+    myopt2("-g", "--threshmul", g, stod,
+            "Thresh multiplication factor, requiring g >= 7."
+            "Higher multiplier means more solutions are counted per round, but fewer rounds are used.");
     myopt2("-e", "--epsilon", epsilon, stod,
             "Tolerance parameter, i.e. how close is the count from the correct count? "
             "Count output is within bounds of (exact_count/(1+e)) < count < (exact_count*(1+e)). "
@@ -305,6 +310,7 @@ void set_approxmc_options()
     appmc->set_seed(seed);
     appmc->set_epsilon(epsilon);
     appmc->set_delta(delta);
+    appmc->set_g(g);
 
     //Improvement options
     appmc->set_reuse_models(reuse_models);
